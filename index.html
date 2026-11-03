@@ -22,11 +22,7 @@ html,body,main,.page{background:#fff!important}header{border:0!important;box-sha
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script><script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script><script>
 // 실제 기록으로 교체할 데이터. image에 사진 URL을 넣으면 두 화면에 동시에 표시됩니다.
 // 좌표와 연도는 시연용 예시이며 실제 발견 위치/시점이 아닙니다.
-const objects=[
-{id:"001",title:"기둥 위의 장갑",date:"2024-11-18",time:"시간 미기록",location:"서울 · 위치 예시",lat:37.5665,lng:126.9780,image:"",note:"누군가 잃어버린 장갑을 다른 누군가가 눈에 잘 띄는 곳에 올려놓았을지도 모른다."},
-{id:"002",title:"벤치 아래의 신발",date:"2023-06-04",time:"시간 미기록",location:"서울 · 위치 예시",lat:37.5480,lng:127.0410,image:"",note:"가지런히 놓인 신발. 이곳에 두고 간 사람의 사정은 알 수 없다."},
-{id:"003",title:"식물에 걸린 장신구",date:"2022-09-21",time:"시간 미기록",location:"서울 · 위치 예시",lat:37.5770,lng:126.9860,image:"",note:"본래의 자리를 벗어나 다른 풍경의 일부가 된 물건."}
-];
+let objects=[];
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const photo=o=>'<div class="photo">'+(o.image?'<img src="'+escapeHtml(o.image)+'" alt="'+escapeHtml(o.title)+'" loading="lazy">':'<div class="placeholder">IMAGE PENDING<br>사진을 추가할 수 있습니다</div>')+'</div>';
 let svg,projection,zoomBehavior,viewport,selectedIndex=-1;
@@ -44,5 +40,5 @@ document.getElementById('map').insertAdjacentHTML('beforeend','<div class="map-c
 function zoomBy(factor){svg.transition().duration(400).call(zoomBehavior.scaleBy,factor)}
 function renderTimeline(){const ordered=[...objects].sort((a,b)=>a.date.localeCompare(b.date));document.getElementById('timeline').innerHTML='<div class="timeline-intro">FOUND OBJECTS / CHRONOLOGICAL RECORD · SCROLL →</div><div class="timeline-track">'+ordered.map((o,i)=>'<button class="timeline-entry" data-id="'+escapeHtml(o.id)+'" style="--photo-height:'+(175+(i%4)*23)+'px"><span class="tl-number">FIG. '+String(i+1).padStart(2,'0')+'</span><div class="tl-figure">'+photo(o)+'</div><div class="tl-date">'+escapeHtml(o.date)+'</div><div class="tl-stem"></div><div class="tl-dot"></div><div class="tl-caption">'+escapeHtml(o.title)+'<small>'+escapeHtml(o.location)+'<br>'+escapeHtml(o.note)+'</small></div></button>').join('')+'</div>';document.querySelectorAll('.timeline-entry').forEach(el=>el.addEventListener('click',()=>selectObject(objects.find(o=>o.id===el.dataset.id),true)))}
 function route(){const page=location.hash==='#timeline'?'timeline':'map';document.querySelectorAll('.page').forEach(el=>el.classList.toggle('active',el.id===page+'-page'));document.querySelectorAll('nav a').forEach(el=>{el.classList.toggle('active',el.dataset.page===page);if(el.dataset.page===page)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current')});if(page==='map'&&svg)svg.attr('viewBox','0 0 '+mapWidth+' '+mapHeight)}
-renderTimeline();route();initMap();window.addEventListener('hashchange',route);
+async function startArchive(){try{const response=await fetch('./data/objects.json');if(!response.ok)throw new Error('HTTP '+response.status);objects=await response.json();renderTimeline();route();initMap();window.addEventListener('hashchange',route)}catch(error){console.error(error);document.getElementById('map').textContent='기록을 불러오지 못했습니다. 새로고침해 주세요.';route()}}startArchive();
 </script></body></html>
