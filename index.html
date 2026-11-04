@@ -14,6 +14,12 @@ html,body,main,.page{background:#fff!important}header{border:0!important;box-sha
 .detail.open{overflow:visible}.detail.open .photo{overflow:hidden}.popup-title-row{display:block;text-align:center}.popup-side{position:absolute;top:50%;transform:translateY(-50%);z-index:10;border:0;background:rgba(255,255,255,.94);color:#111;width:45px;height:76px;font-size:26px;cursor:pointer;opacity:0;transition:opacity .2s,background .2s;display:grid;place-items:center}.popup-side-prev{left:0}.popup-side-next{right:0}.detail.open:hover .popup-side,.popup-side:focus-visible{opacity:1}.popup-side:hover{background:#fff}.detail.open.expanded .popup-side{width:60px;height:100px}@media(hover:none){.popup-side{opacity:.85;width:35px;height:60px}}@media(max-width:520px){.popup-side{width:35px;height:64px}}
 .detail.open .popup-side{top:0!important;bottom:0!important;transform:none!important;height:100%!important;width:22%!important;max-width:none!important;min-width:58px!important;background:rgba(255,255,255,0)!important;opacity:0!important;display:flex;align-items:center;justify-content:center;transition:background .2s ease,opacity .2s ease!important}.detail.open .popup-side-prev{left:0!important}.detail.open .popup-side-next{right:0!important}.detail.open:hover .popup-side{opacity:0!important}.detail.open .popup-side:hover,.detail.open .popup-side:focus-visible{opacity:1!important;background:rgba(255,255,255,.62)!important}.detail.open.expanded .popup-side{height:100%!important;width:18%!important}@media(hover:none){.detail.open .popup-side{opacity:.7!important;background:rgba(255,255,255,.24)!important}.detail.open .popup-side:active{background:rgba(255,255,255,.65)!important}}
 .detail.open .popup-side{width:11%!important;min-width:28px!important;z-index:2!important}.detail.open.expanded .popup-side{width:9%!important;min-width:28px!important}.detail.open .popup-actions{position:relative!important;z-index:30!important;display:flex!important;justify-content:flex-end!important;flex-shrink:0!important;pointer-events:auto!important}.detail.open .popup-actions button{position:relative!important;z-index:31!important;pointer-events:auto!important;cursor:pointer!important}.detail.open .popup-side:hover,.detail.open .popup-side:focus-visible{background:rgba(255,255,255,.62)!important}
+
+/* Fit the popup to each photo's natural aspect ratio. */
+.detail.open,.detail.open.expanded{box-sizing:border-box}
+.detail.open .photo,.detail.open.expanded .photo{aspect-ratio:auto!important;width:100%;height:var(--popup-image-height,240px)!important;min-height:0!important;flex:none;margin-bottom:0;background:transparent}
+.detail.open .photo img,.detail.open.expanded .photo img{display:block;width:100%;height:100%;object-fit:contain}
+.detail.open .popup-title-row,.detail.open .popup-info{flex:none;overflow-wrap:anywhere}
 </style></head><body>
 <header><a class="brand" href="./" aria-label="홈 - 지도">THINGS OUT OF PLACE<small>제자리에 없는 것들 · AN ARCHIVE OF FOUND OBJECTS</small></a><nav><a href="./" data-page="map">MAP</a><a href="#timeline" data-page="timeline">TIMELINE</a></nav></header>
 <main><section id="map-page" class="page"><div class="map-layout"><div id="map" aria-label="발견된 사물의 위치 지도"></div><aside class="detail" id="detail"></aside></div></section>
@@ -28,8 +34,42 @@ const photo=o=>'<div class="photo">'+(o.image?'<img src="'+escapeHtml(o.image)+'
 let svg,projection,zoomBehavior,viewport,selectedIndex=-1;
 const mapWidth=1200,mapHeight=620;
 function focusObject(o,animate=true){if(!Number.isFinite(o.lat)||!Number.isFinite(o.lng))return;const point=projection([o.lng,o.lat]);if(!point)return;const scale=3.1;const x=mapWidth*.47-point[0]*scale,y=mapHeight*.48-point[1]*scale;const transform=d3.zoomIdentity.translate(x,y).scale(scale);const target=animate?svg.transition().duration(950):svg;target.call(zoomBehavior.transform,transform)}
-function selectObject(o,goMap=false){selectedIndex=objects.indexOf(o);const detail=document.getElementById('detail');detail.classList.add('open');detail.classList.remove('expanded');detail.innerHTML='<button class="popup-side popup-side-prev" aria-label="이전 물건" onclick="stepObject(-1)">←</button><button class="popup-side popup-side-next" aria-label="다음 물건" onclick="stepObject(1)">→</button><div class="popup-actions"><button class="popup-expand" aria-label="팝업 크게 보기" title="크게 보기" onclick="togglePopupSize()">⤢</button><button class="detail-close" aria-label="닫기" onclick="closeDetail()">×</button></div>'+photo(o)+'<div class="popup-title-row"><span class="popup-title">'+escapeHtml(o.title)+'</span></div><div class="popup-info"><div>'+escapeHtml(o.location)+'</div><div>'+escapeHtml(o.date)+' '+escapeHtml(o.time||'시간 미기록')+'</div></div>';d3.selectAll('.map-pin').classed('selected',function(){return this.dataset.id===o.id});if(goMap){location.hash='map';setTimeout(()=>focusObject(o),90)}else focusObject(o)}
-function togglePopupSize(){const el=document.getElementById('detail');const expanded=el.classList.toggle('expanded');el.querySelector('.popup-expand').textContent=expanded?'⤡':'⤢';el.querySelector('.popup-expand').setAttribute('aria-label',expanded?'중앙 확대 닫기':'이미지 중앙 확대')}
+
+function fitPopupToPhoto(){
+ const detail=document.getElementById('detail'),img=detail.querySelector('.photo img');
+ if(!detail.classList.contains('open')||!img||!img.naturalWidth)return;
+ const expanded=detail.classList.contains('expanded'),mobile=window.innerWidth<=520;
+ const style=getComputedStyle(detail),px=parseFloat(style.paddingLeft)+parseFloat(style.paddingRight),py=parseFloat(style.paddingTop)+parseFloat(style.paddingBottom),gap=parseFloat(style.rowGap)||0;
+ const layout=document.querySelector('.map-layout');
+ const maxWidth=expanded?Math.min(900,window.innerWidth-(mobile?24:48)):Math.min(620,layout.clientWidth-(mobile?16:32));
+ if(!expanded)detail.style.bottom=Math.max(mobile?8:16,layout.clientHeight-(window.innerHeight-layout.getBoundingClientRect().top)+(mobile?8:16))+'px';
+ const maxHeight=expanded?window.innerHeight-48:Math.min(layout.clientHeight,window.innerHeight-layout.getBoundingClientRect().top)-(mobile?16:32);
+ const ratio=img.naturalWidth/img.naturalHeight,others=[...detail.children].filter(el=>!el.classList.contains('photo')&&!el.classList.contains('popup-side'));
+ const minWidth=Math.min(maxWidth,200+px);
+ let width=maxWidth;
+ for(let i=0;i<12;i++){
+  detail.style.width=width+'px';
+  const overhead=py+others.reduce((sum,el)=>sum+el.getBoundingClientRect().height,0)+gap*others.length;
+  const height=Math.max(1,Math.min((maxWidth-px)/ratio,maxHeight-overhead));
+  const next=Math.max(minWidth,Math.min(maxWidth,height*ratio+px));
+  detail.style.setProperty('--popup-image-height',height+'px');
+  if(Math.abs(next-width)<0.5)break;
+  width=next;
+ }
+ detail.style.width=width+'px';
+}
+function preparePopupPhoto(){
+ const img=document.querySelector('#detail .photo img');
+ if(!img)return;
+ img.loading='eager';
+ img.addEventListener('load',fitPopupToPhoto,{once:true});
+ if(img.complete)fitPopupToPhoto();
+ requestAnimationFrame(fitPopupToPhoto);
+}
+window.addEventListener('resize',fitPopupToPhoto);
+
+function selectObject(o,goMap=false){selectedIndex=objects.indexOf(o);const detail=document.getElementById('detail');detail.classList.add('open');detail.classList.remove('expanded');detail.innerHTML='<button class="popup-side popup-side-prev" aria-label="이전 물건" onclick="stepObject(-1)">←</button><button class="popup-side popup-side-next" aria-label="다음 물건" onclick="stepObject(1)">→</button><div class="popup-actions"><button class="popup-expand" aria-label="팝업 크게 보기" title="크게 보기" onclick="togglePopupSize()">⤢</button><button class="detail-close" aria-label="닫기" onclick="closeDetail()">×</button></div>'+photo(o)+'<div class="popup-title-row"><span class="popup-title">'+escapeHtml(o.title)+'</span></div><div class="popup-info"><div>'+escapeHtml(o.location)+'</div><div>'+escapeHtml(o.date)+' '+escapeHtml(o.time||'시간 미기록')+'</div></div>';preparePopupPhoto();d3.selectAll('.map-pin').classed('selected',function(){return this.dataset.id===o.id});if(goMap){location.hash='map';setTimeout(()=>{focusObject(o);fitPopupToPhoto()},90)}else focusObject(o)}
+function togglePopupSize(){const el=document.getElementById('detail');const expanded=el.classList.toggle('expanded');el.querySelector('.popup-expand').textContent=expanded?'⤡':'⤢';el.querySelector('.popup-expand').setAttribute('aria-label',expanded?'중앙 확대 닫기':'이미지 중앙 확대');fitPopupToPhoto()}
 function stepObject(direction){if(selectedIndex<0)return;selectObject(objects[(selectedIndex+direction+objects.length)%objects.length])}
 function closeDetail(){document.getElementById('detail').classList.remove('open','expanded');selectedIndex=-1;d3.selectAll('.map-pin').classed('selected',false)}
 function resetMap(){svg.transition().duration(850).call(zoomBehavior.transform,d3.zoomIdentity)}
