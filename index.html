@@ -43,10 +43,10 @@ html,body,main,.page{background:#fff!important}header{border:0!important;box-sha
 .date-photo:before{content:'';position:absolute;left:50%;top:-4px;width:3px;height:3px;background:#333;transform:translateX(-50%)}
 .date-photo .photo{width:100%;height:var(--date-photo-height);aspect-ratio:auto;background:#eee;overflow:hidden}
 .date-photo .photo img{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(1)}
-.is-detailed .date-photo .photo img{object-fit:contain}
+.is-detailed .date-photo .photo img{object-fit:cover}
 .date-photo:hover,.date-photo:focus-visible{z-index:3;outline:1px solid #222;outline-offset:3px}
 .date-photo-date,.date-photo-title{display:none}
-.is-detailed .date-photo-date{display:block;font-size:10px;margin:9px 0 5px;white-space:nowrap}
+.is-detailed .date-photo-date{display:block;font-size:9px;margin:9px 0 5px;white-space:nowrap}
 .is-detailed .date-photo-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
 .date-timeline-undated{display:flex;gap:14px;align-items:center;margin-top:24px;font-size:10px;color:#777;flex-wrap:wrap}
 .date-timeline-undated:empty{display:none}
@@ -122,7 +122,7 @@ function buildTimelineModel(records){
  return {dated,undated,first,last,start:Date.UTC(first,0,1),end:Date.UTC(last+1,0,1)};
 }
 function layoutTimeline(model,width,zoom){
- const cardWidth=Math.min(150,zoom>=3?100+(zoom-3)*5:8+zoom*8),laneEnds=[];
+ const cardWidth=Math.min(120,zoom>=3?80+(zoom-3)*3:4+zoom*4),laneEnds=[];
  const items=model.dated.map(o=>{const x=24+(o.stamp-model.start)/(model.end-model.start)*(width-48);let lane=laneEnds.findIndex(end=>end<=x-cardWidth/2-4);if(lane<0)lane=laneEnds.length;laneEnds[lane]=x+cardWidth/2;return {o,x,lane}});
  return {items,cardWidth,lanes:Math.max(1,laneEnds.length)};
 }
@@ -151,7 +151,7 @@ function drawTimeline(){
  const canvas=scroll.querySelector('.date-timeline-canvas'),width=scroll.clientWidth*timelineZoom;
  const layout=layoutTimeline(timelineModel,width,timelineZoom),detailed=timelineZoom>=3;
  const compactGap=timelineZoom===1?8:16;
- const figureHeight=timelineZoom===1?Math.min(67,Math.max(8,(Math.max(200,window.innerHeight-280)-76)/layout.lanes-compactGap)):Math.min(160,60+timelineZoom*7),laneHeight=figureHeight+(detailed?76:compactGap),height=76+layout.lanes*laneHeight;
+ const figureHeight=timelineZoom===1?Math.max(100,Math.min(180,(Math.max(200,window.innerHeight-280)-76)/layout.lanes-compactGap)):Math.max(180,layout.cardWidth*3),laneHeight=figureHeight+(detailed?76:compactGap),height=76+layout.lanes*laneHeight;
  canvas.style.width=width+'px';canvas.style.height=height+'px';canvas.classList.toggle('is-detailed',detailed);
  const position=stamp=>24+(stamp-timelineModel.start)/(timelineModel.end-timelineModel.start)*(width-48);
  let ticks='';for(let year=timelineModel.first;year<=timelineModel.last;year++){
