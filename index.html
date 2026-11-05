@@ -254,7 +254,7 @@ function drawTimeline(){
   return yearLabel+'<div class="archive-stem" style="left:'+x+'px;top:'+bottom+'px;height:'+(axisY-bottom)+'px"></div><button type="button" class="archive-photo" data-id="'+escapeHtml(o.id)+'" style="left:'+x+'px;top:'+top+'px;width:'+layout.cardWidth+'px;--archive-photo-height:'+photoHeight+'px" title="'+escapeHtml(o.date+' · '+o.title+' · '+o.location)+'" aria-label="'+escapeHtml(o.date+' · '+o.title)+'"><span class="archive-fig">Fig. '+String(index+1).padStart(2,'0')+'</span>'+photo(o)+'<span class="archive-photo-date">'+escapeHtml(o.date)+'</span></button><span class="archive-dot" style="left:'+x+'px;top:'+axisY+'px"></span><div class="archive-caption" style="left:'+x+'px;top:'+(axisY+24)+'px;width:'+layout.cardWidth+'px"><div class="archive-caption-title">'+escapeHtml(o.title)+'</div><div class="archive-caption-place">'+escapeHtml(o.location)+'</div><div class="archive-caption-time">'+escapeHtml(o.time||'')+'</div></div>';
  }).join('');
  canvas.innerHTML='<div class="archive-axis" style="top:'+axisY+'px"></div>'+cards;
- canvas.querySelectorAll('.archive-photo').forEach(el=>el.onclick=()=>selectObject(objects.find(o=>o.id===el.dataset.id),true));
+ canvas.querySelectorAll('.archive-photo').forEach(el=>el.onclick=()=>openTimelinePhoto(objects.find(o=>o.id===el.dataset.id)));
 }
 window.addEventListener('resize',()=>{if(location.hash==='#timeline')drawTimeline()});
 
