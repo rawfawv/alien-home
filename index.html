@@ -64,6 +64,12 @@ html,body,main,.page{background:#fff!important}header{border:0!important;box-sha
 #popup-outside-navigation button span{opacity:0;transition:opacity .15s;padding:8px;background:rgba(255,255,255,.72);border-radius:3px;max-width:100%;overflow:hidden}
 #popup-outside-navigation button:hover span,#popup-outside-navigation button:focus-visible span{opacity:1}
 #popup-outside-navigation button:focus-visible{outline:1px solid #aaa;outline-offset:-2px}
+
+/* Align popup controls in one row without inherited close-button offsets. */
+.detail.open .popup-actions{height:32px;min-height:32px;gap:6px;align-items:center;justify-content:flex-end}
+.detail.open .popup-actions button{position:static!important;inset:auto!important;transform:none!important;display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;margin:0;padding:0;border:0;border-radius:3px;font-size:22px;line-height:1}
+.detail.open .popup-actions button:hover{background:#f2f2f2}
+.detail.open .popup-actions button:focus-visible{outline:1px solid #777;outline-offset:2px}
 </style></head><body>
 <header><a class="brand" href="./" aria-label="홈 - 지도">THINGS OUT OF PLACE<small>제자리에 없는 것들 · AN ARCHIVE OF FOUND OBJECTS</small></a><nav><a href="./" data-page="map">MAP</a><a href="#timeline" data-page="timeline">TIMELINE</a></nav></header>
 <main><section id="map-page" class="page"><div class="map-layout"><div id="map" aria-label="발견된 사물의 위치 지도"></div><aside class="detail" id="detail"></aside></div></section>
