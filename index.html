@@ -103,7 +103,7 @@ body.timeline-view,body.timeline-view header,#timeline-page.active{background:#f
 .archive-caption-title{font-size:10px;font-style:italic;color:#555e50;margin-bottom:9px;overflow-wrap:anywhere}
 .archive-caption-place{font-size:8px;line-height:1.7;overflow-wrap:anywhere}
 .archive-caption-time{font-size:8px;color:#919187;margin-top:7px}
-.archive-year{position:absolute;top:3px;bottom:0;border-left:1px solid #d6d2c6;z-index:0;pointer-events:none}
+.archive-year{position:absolute;top:3px;height:calc(var(--archive-axis-y) - 3px);border-left:1px solid #d6d2c6;z-index:0;pointer-events:none}
 .archive-year span{display:block;transform:translateX(5px);font-size:11px;color:#994e45;background:#ffffff;width:max-content;padding:2px 0}
 .is-overview .archive-fig,.is-overview .archive-photo-date,.is-overview .archive-caption{display:none}
 .is-overview .archive-dot{width:4px;height:4px}
@@ -238,7 +238,7 @@ function drawTimeline(){
  const scroll=document.querySelector('.date-timeline-scroll');if(!scroll||!timelineModel||!scroll.clientWidth)return;
  const canvas=scroll.querySelector('.date-timeline-canvas'),layout=layoutTimeline(timelineModel,scroll.clientWidth,timelineZoom),compact=layout.cardWidth<45;
  const axisY=Math.min(560,Math.max(350,window.innerHeight-340)),height=axisY+(compact?48:185),ratio=timelineZoom/TIMELINE_DEFAULT_ZOOM;
- canvas.style.width=layout.width+'px';canvas.style.height=height+'px';canvas.classList.toggle('is-overview',compact);
+ canvas.style.setProperty('--archive-axis-y',axisY+'px');canvas.style.width=layout.width+'px';canvas.style.height=height+'px';canvas.classList.toggle('is-overview',compact);
  const rhythms=[1,.82,.58,.94,.72,.88,.66,.98];let lastYear='';
  const cards=layout.items.map(({o,index,x})=>{
   const year=o.date.slice(0,4),newYear=year!==lastYear;lastYear=year;
