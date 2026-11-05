@@ -113,6 +113,11 @@ body.timeline-view,body.timeline-view header,#timeline-page.active{background:#f
 @media(max-width:600px){#timeline{margin:12px 12px 20px;padding:22px 8px 16px!important}.archive-heading{display:block;padding:0 12px 14px}.archive-heading h1{font-size:17px}.archive-heading h1 em{display:block;margin:6px 0 0;font-size:12px}.archive-heading .date-timeline-zoom{margin-top:18px;max-width:none;justify-content:flex-start}.archive-scale-row{flex-basis:auto}.archive-heading .date-timeline-zoom input{width:80px}.archive-scroll-hint{padding:8px 12px 2px;font-size:7px}.date-timeline-undated{margin-left:12px;margin-right:12px}}
 
 .archive-heading{justify-content:flex-end;padding-bottom:8px}.archive-heading .date-timeline-zoom{margin-top:0}@media(max-width:600px){.archive-heading{display:flex}}
+
+/* Apply grayscale once on the thumbnail; clear it on hover/focus. */
+button.archive-photo .photo{filter:grayscale(1);transition:filter .2s ease}
+button.archive-photo .photo img{filter:none!important;mix-blend-mode:normal!important}
+button.archive-photo:hover .photo,button.archive-photo:focus-visible .photo{filter:none!important}
 </style></head><body>
 <header><a class="brand" href="./" aria-label="홈 - 지도">THINGS OUT OF PLACE<small>제자리에 없는 것들 · AN ARCHIVE OF FOUND OBJECTS</small></a><nav><a href="./" data-page="map">MAP</a><a href="#timeline" data-page="timeline">TIMELINE</a></nav></header>
 <main><section id="map-page" class="page"><div class="map-layout"><div id="map" aria-label="발견된 사물의 위치 지도"></div><aside class="detail" id="detail"></aside></div></section>
