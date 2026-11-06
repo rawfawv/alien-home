@@ -644,7 +644,7 @@
     "location": "프랑스 파리",
     "lat": 48.88008888888889,
     "lng": 2.298388888888889,
-    "image": "",
+    "image": "images/IMG_5809.jpg",
     "note": "",
     "source": "IMG_5809.HEIC",
     "utcOffset": "+01:00"
@@ -657,9 +657,22 @@
     "location": "프랑스 파리",
     "lat": 48.860736111111116,
     "lng": 2.3517638888888888,
-    "image": "",
+    "image": "images/IMG_6656_2.jpg",
     "note": "",
     "source": "IMG_6656 2.HEIC",
     "utcOffset": "+01:00"
+  },
+  {
+    "id": "059",
+    "title": "돌난간 위 열쇠 두 개",
+    "source": "IMG_4064.HEIC",
+    "date": "2025-08-05",
+    "time": "21:34:46",
+    "lat": 37.55854444444444,
+    "lng": 127.03563055555556,
+    "utcOffset": "+09:00",
+    "image": "images/IMG_4064.jpg",
+    "location": "대한민국 서울특별시 성동구 행당1동 고산자로6길 40",
+    "note": ""
   }
 ]
